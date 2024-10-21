@@ -1,6 +1,6 @@
 const express = require('express');
 const jwt = require('jsonwebtoken');
-let books = require("./booksdb.js");
+let books = require("./booksdb.js").default;
 const regd_users = express.Router();
 
 let users = [];
@@ -16,7 +16,13 @@ const authenticatedUser = (username,password)=>{ //returns boolean
 //only registered users can login
 regd_users.post("/login", (req,res) => {
   //Write your code here
-  return res.status(300).json({message: "Yet to be implemented"});
+  const { username, password } = req.body;
+  const user = users.find(u => u.username === username && u.password === password);
+  if (!user) {
+    return res.status(400).json({ message: 'Invalid credentials' });
+  }
+  const token = jwt.sign({ id: user.id }, 'your_jwt_secret');
+  return res.json({ token });
 });
 
 // Add a book review
